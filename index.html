@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <title>성과공유제 전략 분석 리포트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* PDF 인쇄 설정 */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        .page {
+            width: 297mm;
+            height: 210mm;
+            margin: 20px auto;
+            background: white;
+            padding: 12mm 18mm;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media print {
+            body {
+                background: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                width: 297mm;
+                height: 210mm;
+                /* 인쇄 시 테두리나 배경이 잘 보이지 않는 현상 방지 */
+                border: none !important;
+            }
+
+            /* 마지막 페이지에서 빈 페이지 생기는 것 방지 */
+            .page:last-child {
+                page-break-after: auto !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            /* 입력 폼 인쇄 스타일 최적화 */
+            input,
+            select {
+                border: none !important;
+                background: transparent !important;
+                appearance: none !important;
+                padding: 0 !important;
+                font-size: inherit !important;
+                font-weight: 800 !important;
+                color: #1e293b !important;
+            }
+
+            /* 화살표 제거 (select) */
+            select {
+                background-image: none !important;
+            }
+        }
+
+        .page-header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-footer {
+            margin-top: auto;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 800;
+            color: #94a3b8;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title span {
+            width: 4px;
+            height: 1.25rem;
+            background: #2563eb;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .data-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            font-weight: 800;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+
+        /* 타임라인 스타일 */
+        .timeline-container {
+            position: relative;
+            padding-left: 2.2rem;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background-image: linear-gradient(to bottom, #cbd5e1 50%, transparent 50%);
+            background-size: 2px 10px;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2.2rem;
+            margin-left: -1px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 9999px;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px currentColor;
+            background-color: currentColor;
+            z-index: 10;
+        }
+
+        /* QR 코드 영역 */
+        .qr-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            background: #fff;
+            border: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .qr-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-wrapper input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .qr-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-weight: 800;
+        }
+
+        .qr-wrapper:hover .qr-overlay {
+            opacity: 1;
+        }
+
+        .roi-highlight-card {
+            background-color: #ffffff;
+            border: 4px solid #2563eb;
+            border-radius: 16px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            word-break: keep-all;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 인쇄 버튼 -->
+    <button onclick="window.print()" class="btn-print no-print">리포트 인쇄 (PDF 저장)</button>
+
+    <!-- PAGE 1: 가로형 메인 표지 -->
+    <!-- 부모 컨테이너: 화면 전체 꽉 채우고 자식 요소를 정중앙에 배치 -->
+    <div class="page cover-page h-screen flex items-center justify-center relative overflow-hidden bg-white">
+
+        <!-- 배경 디자인 요소: 중앙 정렬에 영향을 주지 않도록 absolute 설정 -->
+        <div class="cover-accent-circle absolute bg-blue-100 rounded-full w-96 h-96 -top-20 -left-20 opacity-50"></div>
+
+        <!-- 실제 콘텐츠 그룹 -->
+        <div class="cover-content z-10">
+            <div class="cover-info-group">
+                <div class="text-center">
+                    <p class="text-blue-500 font-black text-2xl mb-4 tracking-widest">CONSULTING PROPOSAL</p>
+                    <p class="text-blue-600 font-black text-6xl">컨설팅 제안서</p>
+                    <h1 class="text-5xl font-extrabold text-slate-900 mt-6 leading-tight">
+                        성과공유제 도입 전략 분석
+                    </h1>
+                    <div class="w-20 h-2 bg-blue-500 mx-auto mt-8"></div> <!-- 장식용 바 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <div class="text-blue-600 font-black text-xs tracking-widest">CHAPTER 01</div>
+                <h1 class="text-3xl font-black text-slate-900">성과공유제 도입의 전략적 가치</h1>
+            </div>
+            <div class="text-right text-xs font-bold text-slate-400 uppercase">Strategic Insight Report</div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card bg-gray-100 border-gray-100 flex flex-col">
+                <h2 class="section-title"><span></span>제도 정의 및 핵심</h2>
+                <p class="text-sm text-slate-800 leading-relaxed mb-6 font-black">
+                    중소기업과 근로자가 경영 목표 달성에 따른 성과를 공유하기로 약정하는 제도입니다. 이는 단순한 복지를 넘어 <span class="text-blue-700">'기업 이익의 인재
+                        투자'</span>를 통한 선순환 구조를 만듭니다.
+                </p>
+                <div class="space-y-4 font-black">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                        <div class="text-[11px] font-black text-blue-500 mb-1">법적 근거</div>
+                        <div class="text-xs text-slate-900">조세특례제한법 제19조</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                        <div class="text-[11px] font-black text-blue-500 mb-1">주요 방식</div>
+                        <div class="text-xs text-slate-900">성과급, 주식매수선택권, 내일채움공제 등</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-emerald-50 border-emerald-100 flex flex-col">
+                <h2 class="section-title"><span></span>도입 시 5대 기대효과</h2>
+                <div class="space-y-3 text-[14px] font-black">
+                    <div class="flex items-center gap-3 p-3 bg-blue-50 rounded text-blue-900">💰 법인세 절감 (지급액의 15%)</div>
+                    <div class="flex items-center gap-3 p-3 bg-emerald-50 rounded text-emerald-900">👤 핵심 인력 장기 재직 유도
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-purple-50 rounded text-purple-900">📈 정부 지원사업 가점 확보</div>
+                    <div class="flex items-center gap-3 p-3 bg-orange-50 rounded text-orange-900">🎖️ 병역지정업체 선정 우대</div>
+                    <div class="flex items-center gap-3 p-3 bg-slate-100 rounded text-slate-900">🤝 노사 신뢰 및 경영 투명성</div>
+                </div>
+            </div>
+
+            <div class="card bg-amber-50 border-amber-100 flex flex-col">
+                <h2 class="section-title text-blue-900"><span class="bg-blue-600"></span>대표님을 위한 제언</h2>
+                <div class="flex-grow flex flex-col justify-between">
+                    <p
+                        class="text-[14px] text-slate-900 leading-relaxed font-black mb-4 border-l-4 border-blue-400 pl-4">
+                        "단기적인 <span class="text-red-500">인건비 상승</span>으로 보일 수 있으나, 세무적으로 <span class="text-blue-600">실질
+                            부담을 낮추면서</span> 우수 인력을 확보하는 <span class="text-emerald-600">스마트한 재무 전략</span>입니다."
+                    </p>
+
+
+                    <div class="bg-white rounded-xl border-2 border-blue-200 p-5 shadow-sm text-center">
+                        <div class="text-[11px] text-blue-600 font-black mb-1 uppercase tracking-tighter">세무 효과 임계점
+                        </div>
+                        <div class="text-2xl font-black text-blue-900 mb-1">실질 부담 <span
+                                class="page1-net-rate">62.6%</span></div>
+                    </div>
+                    <div class="mt-4 roi-highlight-card">
+                        <div class="text-[13px] font-black text-blue-700 mb-3 tracking-widest uppercase">전략적 투자수익률 (ROI)
+                        </div>
+                        <div class="text-4xl font-black text-blue-800 tracking-tight">약 <span
+                                class="page1-support-rate">37.4%</span></div>
+                        <div
+                            class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase shadow-md">
+                            Best Strategy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer">
+            <span class="font-black">© 2026 FINANCIAL STRATEGY CONSULTING</span>
+            <span class="font-black">PAGE 01 / 03</span>
+        </div>
+    </div>
+
+    <!-- PAGE 3 -->
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <div class="text-blue-600 font-black text-xs tracking-widest">CHAPTER 02</div>
+                <h1 class="text-3xl font-black text-slate-900">재무 시뮬레이션 및 절세 분석</h1>
+            </div>
+            <div class="text-right text-xs font-bold text-slate-400 uppercase">Financial Dashboard</div>
+        </div>
+
+        <div class="flex flex-col gap-5 flex-grow">
+            <div class="grid grid-cols-3 gap-5">
+                <div class="card border-blue-200 py-3 px-5">
+                    <label class="data-label font-black">성과급 총액 설정 (원)</label>
+                    <input type="number" id="bonusInput" value="100000000"
+                        class="w-full text-xl font-black mt-1 focus:outline-none" oninput="calculate()">
+                </div>
+                <div class="card py-3 px-5">
+                    <label class="data-label font-black">적용 법인세율</label>
+                    <select id="taxRateSelect" class="w-full font-black mt-1 text-sm cursor-pointer"
+                        onchange="calculate()">
+                        <option value="0.09">9% (5억 이하)</option>
+                        <option value="0.19" selected>19% (5억 초과)</option>
+                        <option value="0.21">21% (200억 초과)</option>
+                    </select>
+                </div>
+                <div class="card py-3 px-5">
+                    <label class="data-label font-black">기업 규모 선택</label>
+                    <select id="corpTypeSelect" class="w-full font-black mt-1 text-sm cursor-pointer"
+                        onchange="calculate()">
+                        <option value="0.15" selected>중소기업 (15%)</option>
+                        <option value="0.10">중견기업 (10%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-5 font-black h-48">
+                <div class="col-span-8 card flex flex-col justify-center">
+                    <div class="text-[11px] font-black text-slate-400 mb-1 uppercase tracking-tight">총 세액 절감액 (TOTAL
+                        SAVINGS)</div>
+                    <div id="totalSaving" class="text-5xl font-black text-blue-600 mb-6">- 37,400,000 원</div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <div class="text-[11px] text-slate-500 mb-1">법인세 손비인정</div>
+                            <div id="save1" class="text-[14px]">19,000,000 원</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <div class="text-[11px] text-slate-500 mb-1">성과공유 세액공제</div>
+                            <div id="save2" class="text-[14px]">15,000,000 원</div>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <div class="text-[11px] text-blue-600 mb-1">지방세 등 합계</div>
+                            <div id="save3" class="text-[14px] text-blue-700">3,400,000 원</div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="col-span-4 card bg-slate-900 border-none flex flex-col items-center justify-center text-center">
+                    <div class="text-[11px] font-black text-slate-400 mb-2 uppercase">기업 실질 부담률</div>
+                    <div id="netCostRate" class="text-5xl font-black text-emerald-400 mb-3">62.6%</div>
+                    <div class="w-[80%] bg-white/10 h-3 rounded-full overflow-hidden">
+                        <div id="costBar" class="h-full bg-emerald-400" style="width: 62.6%"></div>
+                    </div>
+                    <p id="costDescription" class="text-[11px] text-slate-400 mt-5 leading-relaxed font-black">
+                        * 현금 10000만 지출 시, 세무상 혜택으로 인해<br><span class="text-white">3740만이 환급/절감</span>되는 효과
+                    </p>
+                </div>
+            </div>
+
+            <div class="card flex-grow overflow-hidden">
+                <h3 class="text-sm font-black text-slate-800 mb-3 uppercase tracking-tighter">투자 규모별 시나리오 분석</h3>
+                <table class="w-full text-left">
+                    <thead class="text-[11px] font-black border-b-2 border-slate-900 text-slate-900">
+                        <tr>
+                            <th class="py-2 w-1/4">구분</th>
+                            <th class="py-2 text-right">성과급 총액</th>
+                            <th class="py-2 text-right">총 절세액</th>
+                            <th class="py-2 text-right">실질 기업 부담</th>
+                            <th class="py-2 text-center">정부 지원 비중</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[13px] font-black text-slate-800">
+                        <tr class="border-b border-slate-100">
+                            <td class="py-3">보수적 제안</td>
+                            <td id="row1_1" class="text-right">5,000만</td>
+                            <td id="row1_2" class="text-blue-600 text-right">1,870만</td>
+                            <td id="row1_3" class="text-right">3,130만</td>
+                            <td id="row1_4" class="text-emerald-600 text-center">37.4%</td>
+                        </tr>
+                        <tr class="bg-blue-600 text-white font-black">
+                            <td class="py-3 pl-3">현재 계획 (Best Choice)</td>
+                            <td id="row2_1" class="text-right pr-2">10,000만</td>
+                            <td id="row2_2" class="text-right pr-2">3,740만</td>
+                            <td id="row2_3" class="text-right pr-2">6,260만</td>
+                            <td id="row2_4" class="text-center font-black">37.4%</td>
+                        </tr>
+                        <tr class="border-b border-slate-100">
+                            <td class="py-3">공격적 제안</td>
+                            <td id="row3_1" class="text-right">15,000만</td>
+                            <td id="row3_2" class="text-blue-600 text-right">5,610만</td>
+                            <td id="row3_3" class="text-right">9,390만</td>
+                            <td id="row3_4" class="text-emerald-600 text-center">37.4%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-footer">
+            <span class="font-black">본 시뮬레이션 결과는 관련 법령 개정에 따라 변동될 수 있습니다.</span>
+            <span class="font-black">PAGE 02 / 03</span>
+        </div>
+    </div>
+
+    <!-- PAGE 4 -->
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <div class="text-blue-600 font-black text-xs tracking-widest">CHAPTER 03</div>
+                <h1 class="text-3xl font-black text-slate-900">실행 로드맵 및 유의 사항</h1>
+            </div>
+            <div class="text-right text-xs font-bold text-slate-400 uppercase">Implementation Roadmap</div>
+        </div>
+
+        <div class="content-grid h-full">
+            <div class="card col-span-2 border-slate-200 flex flex-col">
+                <h2 class="section-title"><span></span>단계별 실행 프로세스</h2>
+                <div class="timeline-container flex-grow mt-2">
+                    <div class="timeline-item">
+                        <div class="timeline-marker text-blue-600"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 01. 노사간 성과공유 약정서 체결</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            KPI 지표(영업이익 등) 설정 후 근로자 대표와 서면 약정서를 작성합니다. (세무 증빙 필수)
+                        </p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker text-slate-400"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 02. 성과공유기업 확인서 신청</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            중기인력지원시스템 온라인 신청을 통해 '성과공유기업' 확인서를 발급받습니다.
+                        </p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker text-slate-400"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 03. 성과급 지급 및 근로자 감면</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            성과급 지급 시 근로자는 소득세 50% 감면 혜택을 함께 적용받을 수 있습니다.
+                        </p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker text-emerald-500"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 04. 법인세 신고 시 세액공제 반영</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
+                            최종 법인세 신고 시 성과급 지급액의 15%를 세액공제로 환급받습니다.
+                        </p>
+                    </div>
+                </div>
+                <!-- 요청하신 유의 사항 박스 -->
+                <div class="card bg-slate-50 border-none mt-4 p-4">
+                    <h3 class="text-xs font-black text-slate-900 mb-2">💡 유의 사항</h3>
+                    <ul class="text-[11px] font-black text-slate-600 space-y-1">
+                        <li>• 법인세 절감은 지출 비용의 손금 산입을 전제로 하며, 결손 법인의 경우 세액공제 이월 공제를 적용받을 수 있습니다.</li>
+                        <li>• 성과급 지급 시 발생하는 4대보험료 사업자 부담분은 본 시뮬레이션 합계에 포함되지 않았습니다.</li>
+                        <li>• 지자체별 추가 지원 정책 및 고용 유지 조건에 따라 가점 혜택 및 추가 세액공제가 상이할 수 있습니다.</li>
+                        <li>• 본 보고서는 재무 의사결정을 위한 참고 자료이며, 실제 신고 시에는 세무 전문가와 검토하시기 바랍니다.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card bg-slate-900 border-none text-white flex flex-col">
+                <div class="mb-10">
+                    <h2 class="section-title text-white"><span></span>컨설팅 상담 안내</h2>
+                    <div class="space-y-6 mt-6">
+                        <div>
+                            <div class="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-1">Affiliation
+                            </div>
+                            <div class="text-base font-black">삼성생명 삼성센터법인지점</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-1">Expert
+                            </div>
+                            <div class="text-2xl font-black">GFC 최세림</div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-1">Contact
+                            </div>
+                            <div class="text-xl font-black text-white">010-7526-1826</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pt-6 border-t border-white/10 mt-2">
+                    <div class="qr-wrapper no-print" title="클릭하여 QR 코드 이미지 교체">
+                        <img id="qrPreview"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=tel:01075261826"
+                            alt="QR Code">
+                        <div class="qr-overlay">교체하기</div>
+                        <input type="file" accept="image/*" onchange="handleQrUpload(this)">
+                    </div>
+                    <!-- 인쇄용 고정 QR -->
+                    <div class="hidden print:block qr-wrapper">
+                        <img id="qrPreviewPrint"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=tel:01075261826"
+                            alt="QR Code">
+                    </div>
+                    <div class="text-[11px] text-slate-300 leading-tight font-black">
+                        <span class="text-blue-400 font-black block mb-1">QR 코드 스캔</span>
+                        전문가 상담 채널로 연결됩니다.
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-6 opacity-40">
+                    <div class="text-[10px] font-bold text-white uppercase tracking-widest text-center">Trust & Value
+                        Partner</div>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer">
+            <span class="font-black text-slate-900">본 문서는 정보 제공의 목적으로 작성되었습니다.</span>
+            <span class="font-black text-slate-900">PAGE 03 / 03</span>
+        </div>
+    </div>
+
+    <script>
+        const fmt = (n) => new Intl.NumberFormat('ko-KR').format(Math.round(n)) + " 원";
+        const fmtShort = (n) => (n / 10000).toFixed(0) + "만";
+
+        function handleQrUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('qrPreview').src = e.target.result;
+                    document.getElementById('qrPreviewPrint').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function calculate() {
+            const bonus = parseFloat(document.getElementById('bonusInput').value) || 0;
+            const taxRate = parseFloat(document.getElementById('taxRateSelect').value);
+            const creditRate = parseFloat(document.getElementById('corpTypeSelect').value);
+
+            const save1 = bonus * taxRate;
+            const save2 = bonus * creditRate;
+            const save3 = (save1 + save2) * 0.1;
+            const totalSave = save1 + save2 + save3;
+            const netCost = bonus - totalSave;
+
+            const netRateValue = bonus > 0 ? (netCost / bonus * 100).toFixed(1) : 0;
+            const supportRateValue = bonus > 0 ? (totalSave / bonus * 100).toFixed(1) : 0;
+
+            document.getElementById('totalSaving').innerText = "- " + fmt(totalSave);
+            document.getElementById('save1').innerText = fmt(save1);
+            document.getElementById('save2').innerText = fmt(save2);
+            document.getElementById('save3').innerText = fmt(save3);
+            document.getElementById('netCostRate').innerText = netRateValue + "%";
+            document.getElementById('costBar').style.width = netRateValue + "%";
+
+            document.getElementById('costDescription').innerHTML = `* 현금 ${fmtShort(bonus)} 지출 시, 세무상 혜택으로 인해<br><span class="text-white">${fmtShort(totalSave)}이 환급/절감</span>되는 효과`;
+
+            document.querySelectorAll('.page1-net-rate').forEach(el => el.innerText = netRateValue + "%");
+            document.querySelectorAll('.page1-support-rate').forEach(el => el.innerText = supportRateValue + "%");
+
+            updateRow(1, bonus * 0.5, taxRate, creditRate);
+            updateRow(2, bonus, taxRate, creditRate);
+            updateRow(3, bonus * 1.5, taxRate, creditRate);
+        }
+
+        function updateRow(rowIdx, b, t, c) {
+            const s1 = b * t;
+            const s2 = b * c;
+            const s3 = (s1 + s2) * 0.1;
+            const totalS = s1 + s2 + s3;
+            const net = b - totalS;
+            const supportRate = b > 0 ? (totalS / b * 100).toFixed(1) : 0;
+
+            document.getElementById(`row${rowIdx}_1`).innerText = fmtShort(b);
+            document.getElementById(`row${rowIdx}_2`).innerText = fmtShort(totalS);
+            document.getElementById(`row${rowIdx}_3`).innerText = fmtShort(net);
+            document.getElementById(`row${rowIdx}_4`).innerText = supportRate + "%";
+        }
+
+        window.onload = calculate;
+    </script>
+</body>
+
+</html>

@@ -90,8 +90,8 @@
 
         /* QR 코드 래퍼 */
         .qr-wrapper {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             background: #fff;
             padding: 4px;
             border-radius: 8px;
@@ -245,77 +245,86 @@
 
         <div class="content-grid h-full">
             <div class="card col-span-2 border-slate-200 flex flex-col">
-                <h2 class="section-title"><span></span>단계별 실행 프로세스 (5 Steps)</h2>
-                <div class="timeline-container flex-grow">
+                <h2 class="section-title"><span></span>단계별 실행 프로세스</h2>
+                <div class="timeline-container flex-grow mt-2">
                     <div class="timeline-item">
                         <div class="timeline-marker text-blue-600"></div>
-                        <div class="timeline-content">
-                            <span class="step-label">Step 01</span>
-                            <div class="step-title">사내 성과공유제 운영 규정 마련 및 이사회 의결</div>
-                        </div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 01. 노사간 성과공유 약정서 체결</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            KPI 지표(영업이익 등) 설정 후 근로자 대표와 서면 약정서를 작성합니다. (세무 증빙 필수)
+                        </p>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-marker text-blue-500"></div>
-                        <div class="timeline-content">
-                            <span class="step-label">Step 02</span>
-                            <div class="step-title">기업-근로자 간 성과공유 약정서 체결 (서면 필수)</div>
-                        </div>
+                        <div class="timeline-marker text-slate-400"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 02. 성과공유기업 확인서 신청</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            중기인력지원시스템 온라인 신청을 통해 '성과공유기업' 확인서를 발급받습니다.
+                        </p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker text-slate-400"></div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 03. 성과급 지급 및 근로자 감면</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            성과급 지급 시 근로자는 소득세 50% 감면 혜택을 함께 적용받을 수 있습니다.
+                        </p>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-marker text-emerald-500"></div>
-                        <div class="timeline-content">
-                            <span class="step-label">Step 03</span>
-                            <div class="step-title">중소기업인력지원 시스템 '성과공유 도입' 온라인 신청</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker text-emerald-600"></div>
-                        <div class="timeline-content">
-                            <span class="step-label">Step 04</span>
-                            <div class="step-title">경영 목표 달성 확인 및 약정된 성과급 실제 지급</div>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker text-amber-500"></div>
-                        <div class="timeline-content">
-                            <span class="step-label">Step 05</span>
-                            <div class="step-title">법인세 신고 시 조세특례 세액공제 신청 및 증빙 제출</div>
-                        </div>
+                        <div class="text-[15px] font-black text-slate-900 mb-1">Step 04. 법인세 신고 시 세액공제 반영</div>
+                        <p
+                            class="text-[12px] text-slate-700 font-black bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
+                            최종 법인세 신고 시 성과급 지급액의 15%를 세액공제로 환급받습니다.
+                        </p>
                     </div>
                 </div>
-                <div class="card bg-slate-50 border-none mt-2 p-3 text-[11px] font-black text-slate-600 leading-snug">
-                    <p>💡 [주의] 성과급은 영업이익 발생 시 지급이 원칙이며, 재무 상태에 따른 사전 검토가 필수입니다.</p>
+                <!-- 요청하신 유의 사항 박스 -->
+                <div class="card bg-slate-50 border-none mt-4 p-4">
+                    <h3 class="text-xs font-black text-slate-900 mb-2">💡 유의 사항</h3>
+                    <ul class="text-[11px] font-black text-slate-600 space-y-1">
+                        <li>• 법인세 절감은 지출 비용의 손금 산입을 전제로 하며, 결손 법인의 경우 세액공제 이월 공제를 적용받을 수 있습니다.</li>
+                        <li>• 성과급 지급 시 발생하는 4대보험료 사업자 부담분은 본 시뮬레이션 합계에 포함되지 않았습니다.</li>
+                        <li>• 지자체별 추가 지원 정책 및 고용 유지 조건에 따라 가점 혜택 및 추가 세액공제가 상이할 수 있습니다.</li>
+                        <li>• 본 보고서는 재무 의사결정을 위한 참고 자료이며, 실제 신고 시에는 세무 전문가와 검토하시기 바랍니다.</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="card bg-slate-900 border-none text-white flex flex-col justify-between">
+            <div class="card bg-slate-900 border-none text-white flex flex-col justify-between p-6">
                 <div>
-                    <h2 class="section-title text-white"><span></span>컨설팅 상담 안내</h2>
-                    <div class="space-y-4 mt-6">
-                        <div>
-                            <div class="text-[10px] font-black text-blue-400 uppercase mb-1 tracking-widest">Affiliation</div>
-                            <div class="text-sm font-black">삼성생명 삼성센터법인지점</div>
+                    <h2 class="section-title text-white mb-8"><span></span>컨설팅 상담 안내</h2>
+                    <div class="space-y-6">
+                        <div class="flex flex-col gap-1">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-80">Affiliation</div>
+                            <div class="text-[15px] font-black leading-tight text-slate-100">삼성생명 삼성센터법인지점</div>
                         </div>
-                        <div>
-                            <div class="text-[10px] font-black text-blue-400 uppercase mb-1 tracking-widest">Expert</div>
-                            <div class="text-xl font-black">GFC 최세림</div>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-80">Expert</div>
+                            <div class="text-2xl font-black text-white">최세림 GFC</div>
                         </div>
-                        <div>
-                            <div class="text-[10px] font-black text-blue-400 uppercase mb-1 tracking-widest">Contact</div>
-                            <div class="text-lg font-black text-white">010-7526-1826</div>
+                        <div class="flex flex-col gap-2 pt-2">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-80">Contact</div>
+                            <div class="inline-block bg-blue-600/30 border border-blue-500/50 rounded-lg px-4 py-2 text-xl font-black text-white shadow-inner">
+                                010-7526-1826
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="qr-section mt-4 border-t border-white/10 pt-6">
-                    <div class="flex items-center gap-4">
-                        <div class="qr-wrapper">
-                            <!-- 링크를 URL 인코딩하여 깨짐 방지 -->
+                <!-- 요청사항 반영: 하단 QR 안내 섹션 간격 및 가독성 최적화 -->
+                <div class="qr-section mt-8 border-t border-white/20 pt-8">
+                    <div class="flex items-center gap-5">
+                        <div class="qr-wrapper flex-shrink-0 border-2 border-blue-500/30">
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https%3A%2F%2Fmws.samsunglife.com%3A8440%2F%23%2Fmain%2Fbc%2FTSSBC500M%3Fmdigitkey%3D0002221232" alt="컨설턴트 정보 QR">
                         </div>
-                        <div class="text-[11px] text-slate-300 leading-tight font-black">
-                            <span class="text-blue-400 block mb-1">상담 채널 연결</span>
-                            스캔 시 해당 컨설턴트 <br>정보를 확인하실 수 있습니다.
+                        <div class="flex flex-col gap-1.5">
+                            <div class="text-[13px] font-black text-blue-400 tracking-tight">상담 채널 연결</div>
+                            <div class="text-[11px] text-slate-300 leading-normal font-semibold">
+                                스캔 시 해당 컨설턴트의<br>
+                                상세 정보를 확인하실 수 있습니다.
+                            </div>
                         </div>
                     </div>
                 </div>
